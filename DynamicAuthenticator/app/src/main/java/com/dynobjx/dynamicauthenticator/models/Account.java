@@ -10,11 +10,21 @@ public class Account extends RealmObject {
 
     @PrimaryKey
     private String email;
+    private long timeAdded;
 
     public Account() {}
 
-    public Account(String email) {
+    public long getTimeAdded() {
+        return timeAdded;
+    }
+
+    public void setTimeAdded(long timeAdded) {
+        this.timeAdded = timeAdded;
+    }
+
+    public Account(String email, long timeAdded) {
         this.email = email;
+        this.timeAdded = timeAdded;
     }
 
     public String getEmail() {
@@ -24,4 +34,6 @@ public class Account extends RealmObject {
     public void setEmail(String email) {
         this.email = email;
     }
+
+
 }

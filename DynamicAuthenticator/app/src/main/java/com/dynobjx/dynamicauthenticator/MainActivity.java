@@ -4,50 +4,54 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.dynobjx.dynamicauthenticator.adapters.AccountsAdapter;
 import com.dynobjx.dynamicauthenticator.models.Account;
 
 import org.jboss.aerogear.security.otp.Totp;
 import org.jboss.aerogear.security.otp.api.Base32;
 
+import java.util.Calendar;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
 public class MainActivity extends AppCompatActivity {
+
+    @Bind(R.id.rvAccounts) RecyclerView rvAccounts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         Realm realm = Realm.getInstance(this);
-/*        Account account = new Account("rsbulanon@gmail.com");
+        Account account = new Account("ned@flanders.com", Calendar.getInstance().getTime().getTime());
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(account);
-        realm.commitTransaction();*/
+        realm.commitTransaction();
         RealmQuery<Account> query = realm.where(Account.class);
-        RealmResults<Account> res = query.findAll();
-        for (Account a : res) {
-            String secret = Base32.random();
-            Totp totp = new Totp(secret);
-            Log.d("totp", "totp --> " + totp.now());
-        }
+        RealmResults<Account> accounts = query.findAll();
+        AccountsAdapter adapter = new AccountsAdapter(this,accounts);
+        AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(adapter);
+        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(alphaAdapter);
+        rvAccounts.setAdapter(scaleAdapter);
+        rvAccounts.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
