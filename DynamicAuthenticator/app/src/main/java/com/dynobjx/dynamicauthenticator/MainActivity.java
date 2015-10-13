@@ -5,9 +5,19 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.dynobjx.dynamicauthenticator.models.Account;
+
+import org.jboss.aerogear.security.otp.Totp;
+import org.jboss.aerogear.security.otp.api.Base32;
+
+import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,6 +36,18 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        Realm realm = Realm.getInstance(this);
+/*        Account account = new Account("rsbulanon@gmail.com");
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(account);
+        realm.commitTransaction();*/
+        RealmQuery<Account> query = realm.where(Account.class);
+        RealmResults<Account> res = query.findAll();
+        for (Account a : res) {
+            String secret = Base32.random();
+            Totp totp = new Totp(secret);
+            Log.d("totp", "totp --> " + totp.now());
+        }
     }
 
     @Override
